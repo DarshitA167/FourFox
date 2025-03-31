@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@teachablemachine/image": "^0.8.5"
+  }
+}
