@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Four Fox</title>
+    <!-- Font Awesome for social icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body,
+        h1,
+        h3,
+        p {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #F0BB78;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            background-color: #543A14;
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 999;
+        }
+
+        .navbar-brand img {
+            height: 55px;
+            width: 55px;
+            margin-left:30px;
+        }
+
+        .navbar-nav .nav-link {
+            color: #FFF0DC;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #D59C58;
+        }
+
+        .navele h5 {
+            margin-left: 47px;
+            font-size: 1rem;
+            color: #FFF0DC;
+            transition: font-size 0.3s ease, color 0.3s ease;
+        }
+
+        .navele h5:hover {
+            font-size: 1.5rem;
+            color: black;
+        }
+        .navbar-dark {
+        position: absolute;
+        right: 0;
+        display: flex;
+        }
+        html{
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .content {
+        flex: 1;
+        }
+        footer {
+            background-color: rgb(105, 74, 15);
+            color: white;
+            padding: 40px;
+            text-align: left;
+            font-family: Arial, sans-serif;
+            margin-top: auto;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: auto;
+            flex-wrap: wrap;
+        }
+
+        .footer-left {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .footer-left h2 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .footer-left p {
+            color: #ccc;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .footer-links {
+            display: flex;
+            flex: 2;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .footer-links ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
+
+        .footer-links ul li {
+            margin-bottom: 8px;
+        }
+
+        .footer-links ul li a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .footer-links ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-social {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer-social-icons {
+            margin-bottom: 10px;
+        }
+
+        .footer-social-icons a {
+            color: white;
+            margin-right: 10px;
+            font-size: 20px;
+            text-decoration: none;
+        }
+
+        .footer-button {
+            background-color: #e91e63;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .footer-button:hover {
+            background-color: #d81b60;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 20px;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        html{
+            height: 100%;
+            margin: 0;
+            display: flex;
+        }
+        .content {
+        flex: 1;
+        }
+
+        body {
+            background-color: #F0BB78;
+            font-family: Arial, sans-serif;
+        }
+        .main-header {
+            padding: 30px;
+            background-color: #543A14;
+            color: white;
+            font-size: 2.5rem;
+            margin-top: 80px; /* Space for fixed navbar */
+        }
+
+        .group-photo {
+            margin: 30px auto;
+            width: 12%;
+            max-width: 120px;
+        }
+
+        .group-photo img {
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .team-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            padding: 40px;
+            max-width: 1000px;
+            margin: 100px auto 40px; /* Added top margin to create space below navbar */
+        }
+
+        .team-member {
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            height: 450px; /* Increased height to accommodate social links */
+            border: 3px solid #543A14;
+            overflow: hidden;
+            justify-content: space-between; /* This helps with layout spacing */
+        }
+
+        .team-member::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .member-info, 
+        .member-socials {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .member-info {
+            margin-top: 20px;
+        }
+
+        .team-member:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Ladder Effect */
+        .team-member:nth-child(odd) {
+            margin-top: 0px;
+        }
+
+        .team-member:nth-child(even) {
+            margin-bottom: 0px;
+        }
+
+        /* Social Media Section */
+        .social-divider {
+            width: 80%;
+            margin: 15px auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            z-index: 2;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .social-icon a {
+            color: white;
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body style="background-color: #F0BB78;">
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <img class="rounded-pill" src="static/four_fox.png" alt="Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link navele" href="{{ url_for('index') }}"><h5  style="font-size: larger; text-decoration: underline;">Home</h5></a></li>
+                    <li class="nav-item"><a class="nav-link navele" href="{{ url_for('contactUs') }}"><h5>Contact Us</h5></a></li>
+                    <li class="nav-item"><a class="nav-link navele" href="{{ url_for('login') }}"><h5>Login</h5></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Navbar Over -->
+
+    <section class="team-section">
+        <div class="team-member" style="background-image: url('static/darshit.jpeg');">
+            <div class="member-info">
+                <h3>Darshit J. Ahir</h3>
+                <p>Contact: 7862071269</p>
+                <p>Email: djahir167@gmail.com</p>
+            </div>
+            <div class="member-socials">
+                <div class="social-divider"></div>
+                <div class="social-icons">
+                    <div class="social-icon">
+                        <a href="https://www.instagram.com/darshit_ahir" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
+                    <div class="social-icon">
+                        <a href="https://www.linkedin.com/in/darshit-ahir" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                    <div class="social-icon">
+                        <a href="https://github.com/DarshitA167" target="_blank"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="team-member" style="background-image: url('static/alex.jpeg');">
+            <div class="member-info">
+                <h3>Alex Patel</h3>
+                <p>Contact: 8780665893</p>
+                <p>Email: info.alexpatel@gmail.com</p>
+            </div>
+            <div class="member-socials">
+                <div class="social-divider"></div>
+                <div class="social-icons">
+                    <div class="social-icon">
+                        <a href="https://www.instagram.com/alex_patel" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
+                    <div class="social-icon">
+                        <a href="https://www.linkedin.com/in/alex-patel-333b94294?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                    <div class="social-icon">
+                        <a href="https://search.app/1ZKMkQssHp877Q9r7" target="_blank"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="team-member" style="background-image: url('static/rao.jpeg');">
+            <div class="member-info">
+                <h3>Dhruv Rao</h3>
+                <p>Contact: 9737130905</p>
+                <p>Email: dhruvlockedin@gmail.com</p>
+            </div>
+            <div class="member-socials">
+                <div class="social-divider"></div>
+                <div class="social-icons">
+                    <div class="social-icon">
+                        <a href="https://www.instagram.com/dhruv_rao" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
+                    <div class="social-icon">
+                        <a href="https://www.linkedin.com/in/dhruv-rao-7bb141337/" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                    <div class="social-icon">
+                        <a href="https://github.com/dhruvraoo" target="_blank"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="team-member" style="background-image: url('static/aryan.jpeg');">
+            <div class="member-info">
+                <h3>Aryan Naik</h3>
+                <p>Contact: 8866525646</p>
+                <p>Email: aryannaik5380@gmail.com</p>
+            </div>
+            <div class="member-socials">
+                <div class="social-divider"></div>
+                <div class="social-icons">
+                    <div class="social-icon">
+                        <a href="https://www.instagram.com/aryan_naik" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
+                    <div class="social-icon">
+                        <a href="https://www.linkedin.com/in/aryan-naik-751a43358?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                    <div class="social-icon">
+                        <a href="https://github.com/aryannaik14" target="_blank"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-container">
+            <!-- Left Section -->
+            <div class="footer-left">
+                <h2>Colorlib</h2>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi quasi perferendis ratione perspiciatis accusantium.</p>
+            </div>
+
+            <!-- Links Section -->
+            <div class="footer-links">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Portfolio</a></li>
+                    <li><a href="#">Services</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+                <ul>
+                    <li><a href="#">Clients</a></li>
+                    <li><a href="#">Team</a></li>
+                    <li><a href="#">Career</a></li>
+                    <li><a href="#">Testimonials</a></li>
+                    <li><a href="#">Journal</a></li>
+                </ul>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Partners</a></li>
+                </ul>
+            </div>
+
+            <!-- Social Media Section -->
+            <div class="footer-social">
+                <div class="footer-social-icons">
+                    <a href="#">&#x1F4F7;</a>
+                    <a href="#">&#x1F426;</a>
+                    <a href="#">&#x1F3F3;</a>
+                    <a href="#">&#x1F30D;</a>
+                </div>
+                <button class="footer-button">Contact Us</button>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">&copy; 2019-2020 All Rights Reserved.</div>
+    </footer>
+
+    
+</body>
+
+</html>

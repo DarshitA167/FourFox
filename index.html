@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Cancer Detection</title>
+    
+    <!-- Updated library imports with specific versions -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.4.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.5/dist/teachablemachine-image.min.js"></script>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <style>
+        .navbar {
+            background-color: #543A14;
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 999;
+        }
+
+        .navbar-brand img {
+            height: 55px;
+            width: 55px;
+            margin-left:30px;
+        }
+
+        .navbar-nav .nav-link {
+            color: #FFF0DC;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #D59C58;
+        }
+
+        .navele h5 {
+            margin-left: 47px;
+            font-size: 1rem;
+            color: #FFF0DC;
+            transition: font-size 0.3s ease, color 0.3s ease;
+        }
+
+        .navele h5:hover {
+            font-size: 1.5rem;
+            color: black;
+        }
+        .navbar-dark {
+        position: absolute;
+        right: 0;
+        display: flex;
+        }
+
+
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            background-color: #F0BB78;
+        }
+        
+        .content {
+            flex: 1;
+            margin-top: 80px; /* Add space for fixed navbar */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        footer {
+            background-color: rgb(105, 74, 15);
+            color: white;
+            padding: 40px;
+            text-align: left;
+            font-family: Arial, sans-serif;
+            margin-top: auto;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: auto;
+            flex-wrap: wrap;
+        }
+
+        .footer-left {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .footer-left h2 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .footer-left p {
+            color: #ccc;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .footer-links {
+            display: flex;
+            flex: 2;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .footer-links ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
+
+        .footer-links ul li {
+            margin-bottom: 8px;
+        }
+
+        .footer-links ul li a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .footer-links ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-social {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer-social-icons {
+            margin-bottom: 10px;
+        }
+
+        .footer-social-icons a {
+            color: white;
+            margin-right: 10px;
+            font-size: 20px;
+            text-decoration: none;
+        }
+
+        .footer-button {
+            background-color: #e91e63;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .footer-button:hover {
+            background-color: #d81b60;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 20px;
+            color: #ccc;
+            font-size: 14px;
+        }
+        
+        /* Anatomy container */
+        .anatomy-container {
+            width: 400px;
+            height: 600px;
+            margin: 50px auto;
+            position: relative;
+        }
+        
+        .base-image {
+            width: 100%;
+        }
+        
+        .organ {
+            position: absolute;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        
+        .organ:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+        
+        /* Positioning different organs */
+        .brain { 
+            top: 60px; left: 100px; width: 200px; 
+        }
+        
+        .lungs {
+            top: 200px; left: 100px; width: 200px; 
+        }
+        
+        .stomach { 
+            top: 330px; left: 100px; width: 200px; 
+        }
+        
+        .intestine {
+            top: 420px; left: 100px; width: 200px;
+        }
+        
+        .pelvic {
+            top: 520px; left: 100px; width: 200px;
+        }
+        
+        .info-box {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            display: none;
+            max-width: 450px;
+            font-size: 1.5rem;
+        }
+        
+        /* AI Detection Styles */
+        #chatbot-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #543A14;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0px 0px 10px gray;
+        }
+        
+        #chatbot-icon img {
+            width: 40px;
+            height: 40px;
+        }
+        
+        #chatbot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background: white;
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 10px gray;
+            border: solid #543A14 4px;
+            display: none;
+        }
+        
+        #chat-header {
+            background: #543A14;
+            color: white;
+            padding: 10px;
+            border-radius: 10px 10px 0 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        #chat-body {
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #fff;
+        }
+        
+        .user-message, .bot-message {
+            padding: 8px;
+            margin: 5px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+        
+        .user-message {
+            background: #ddd;
+            margin-left: auto;
+        }
+        
+        .bot-message {
+            background: #543A14;
+            color: white;
+        }
+        
+        #chat-input {
+            width: 80%;
+            padding: 5px;
+            border-radius: 10px;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            background-color: #543A14;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 10px;
+            transition: 0.3s ease;
+        }
+        
+        .btn-submit:hover {
+            background-color: #D59C58;
+            transform: scale(1.05);
+            transition: 0.3s ease;
+        }
+        
+        /* Added error message styling */
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        /* Updated webcam container styling */
+        #webcam-container {
+            margin: 20px auto;
+            border: 3px solid #543A14;
+            border-radius: 10px;
+            overflow: hidden;
+            width: 480px;
+            height: 360px;
+            background-color: #333;
+        }
+        
+        #webcam-container canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Status indicator */
+        .status-indicator {
+            margin: 10px auto;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        
+        .status-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .status-pending {
+            background-color: #ffc107;
+            color: black;
+        }
+        
+        .status-error {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        /* Updated prediction bars styling for two-column layout */
+        .prediction-container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 15px;
+            border: 2px solid #543A14;
+            border-radius: 10px;
+            background-color: white;
+        }
+        
+        .prediction-columns {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        
+        .prediction-column {
+            width: 48%;
+        }
+        
+        .prediction-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .prediction-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .prediction-bar {
+            height: 100%;
+            background-color: #543A14;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+        
+        .prediction-value {
+            position: absolute;
+            right: 5px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .detection-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .result-normal {
+            background-color: red;
+            color: white;
+        }
+        
+        .result-warning {
+            background-color: green;
+            color: white;
+        }
+        
+        /* Added to improve layout and navigation */
+        .section-heading {
+            margin-top: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #543A14;
+            font-weight: bold;
+        }
+        
+        .section-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            width: 100%;
+        }
+        
+        .anatomy-section-container {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .anatomy-info {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body onclick="collapseChatbot(event)">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <img class="rounded-pill" src="static/four_fox.png" alt="Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link navele" href="{{ url_for('index') }}"><h5  style="font-size: larger; text-decoration: underline;">Home</h5></a></li>
+                    <li class="nav-item"><a class="nav-link navele" href="{{ url_for('contactUs') }}"><h5>Contact Us</h5></a></li>
+                    <li class="nav-item"><a class="nav-link navele" href="{{ url_for('login') }}"><h5>Login</h5></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="content">
+        <h1 class="section-heading">Cancer Detection & Education Portal</h1>
+        
+        <!-- Interactive Anatomy Section -->
+        <div class="section-container anatomy-section-container">
+            <h2 class="section-heading">Interactive Anatomy</h2>
+            <div class="anatomy-container">
+                <img src="static/human anatomy.jpg" class="base-image" alt="Human Anatomy">
+                <img src="static/brain hack.webp" class="organ brain" alt="Brain" onmouseover="showInfo(event, 'Brain cancer affects the brain cells and can cause neurological symptoms.')" onmouseout="hideInfo()">
+                <img src="static/lungs hack.webp" class="organ lungs" alt="Lungs" onmouseover="showInfo(event, 'Lung cancer is one of the most common cancers, often caused by smoking.')" onmouseout="hideInfo()">
+                <img src="static/stomach hack.webp" class="organ stomach" alt="Stomach" onmouseover="showInfo(event, 'Stomach cancer can affect digestion and cause abdominal pain.')" onmouseout="hideInfo()">
+                <img src="static/intestine hack.webp" class="organ intestine" alt="Intestine" onmouseover="showInfo(event, 'Intestinal cancer includes colorectal cancer, which affects the digestive tract.')" onmouseout="hideInfo()">
+                <img src="static/palvic hack.webp" class="organ pelvic" alt="Pelvic" onmouseover="showInfo(event, 'Pelvic cancer may affect reproductive organs and the bladder.')" onmouseout="hideInfo()">
+                <div id="info-box" class="info-box"></div>
+            </div>
+            <div class="anatomy-info">
+                <h3>Learn About Cancer</h3>
+                <p>Hover over different organs on the human anatomy image to learn about various types of cancer. This interactive guide helps you understand how cancer affects different parts of the body.</p>
+                <p>Early detection is critical for successful treatment. If you have concerns, always consult with a healthcare professional.</p>
+            </div>
+        </div>
+        
+        <!-- AI Cancer Detection Section -->
+        <div class="section-container">
+            <h2 class="section-heading">AI Cancer Detection Tool</h2>
+            <p class="text-center">This AI-powered tool can help identify potential cancer markers. Remember, this is for educational purposes only and should not replace professional medical diagnosis.</p>
+            <div class="text-center mt-3">
+                <button class="btn btn-submit mx-2" onclick="initWebcam()" style="max-width: 200px;">Start Webcam</button>
+                <button class="btn btn-submit mx-2" onclick="loadModel()" style="max-width: 200px;">Load AI Model</button>
+            </div>
+            
+            <div class="text-center">
+                <div id="webcam-status" class="status-indicator status-pending">Webcam not started</div>
+                <div id="model-status" class="status-indicator status-pending">Model not loaded</div>
+            </div>
+            
+            <div id="webcam-container" class="text-center"></div>
+            
+            <!-- Prediction bars will go here -->
+            <div id="label-container" class="prediction-container">
+                <h5 class="text-center">Detection Results</h5>
+                <div id="prediction-bars" class="prediction-columns">
+                    <!-- Prediction columns will be added here dynamically -->
+                    <div id="left-column" class="prediction-column"></div>
+                    <div id="right-column" class="prediction-column"></div>
+                </div>
+                <div id="detection-result"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chatbot -->
+    <div id="chatbot-icon" onclick="toggleChatbot(event)">
+        <!-- Use a chat emoji if image is not available -->
+        <span style="color: white; font-size: 24px;"><img src="static/four_fox.png" class="rounded-pill"></span>
+    </div>
+    
+    <div id="chatbot" onclick="event.stopPropagation()">
+        <div id="chat-header">AI Cancer Detection Assistant</div>
+        <div id="chat-body">
+            <!-- Initial welcome message will be added by initChatbot() -->
+        </div>
+        <input type="text" id="chat-input" class="form-control mt-2" placeholder="Type a message..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
+        <button class="btn btn-submit mt-2" onclick="sendChatMessage()">Send</button>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <!-- Left Section -->
+            <div class="footer-left">
+                <h2>Cancer Detection</h2>
+                <p>Empowering individuals with knowledge and tools for early cancer detection and education.</p>
+            </div>
+
+            <!-- Links Section -->
+            <div class="footer-links">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Resources</a></li>
+                    <li><a href="#">Services</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+                <ul>
+                    <li><a href="#">Doctor Finder</a></li>
+                    <li><a href="#">Cancer Types</a></li>
+                    <li><a href="#">Support Groups</a></li>
+                    <li><a href="#">Educational Materials</a></li>
+                    <li><a href="#">Research</a></li>
+                </ul>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Partners</a></li>
+                </ul>
+            </div>
+
+            <!-- Social Media Section -->
+            <div class="footer-social">
+                <div class="footer-social-icons">
+                    <a href="#">&#x1F4F7;</a>
+                    <a href="#">&#x1F426;</a>
+                    <a href="#">&#x1F3F3;</a>
+                    <a href="#">&#x1F30D;</a>
+                </div>
+                <button class="footer-button">Contact Us</button>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">&copy; 2025 Cancer Detection Portal. All Rights Reserved.</div>
+    </footer>
+    
+    <script>
+        // Anatomy info display functions
+        function showInfo(event, text) {
+            var infoBox = document.getElementById("info-box");
+            infoBox.style.display = "block";
+            infoBox.style.top = event.pageY + 10 + "px";
+            infoBox.style.left = event.pageX + 250 + "px"; // Shifted slightly to the right
+
+            infoBox.innerHTML = text;
+        }
+
+        function hideInfo() {
+            document.getElementById("info-box").style.display = "none";
+        }
+        
+        // Global variables for AI detection
+        let webcam;
+        let model;
+        let maxPredictions;
+        let isModelPredicting = false;
+        
+        // URL to the model files - FIXED ORDER
+        const modelURL = 'static/model.json';
+        const metadataURL = 'static/metadata.json';
+        
+        // Check if libraries are loaded
+        function checkLibrariesLoaded() {
+            if (typeof tmImage === "undefined") {
+                console.error("Teachable Machine Image module is not loaded");
+                const webcamContainer = document.getElementById("webcam-container");
+                webcamContainer.innerHTML = '<div class="error-message">Error: Teachable Machine Image module failed to load. Please check your internet connection and ensure content blockers are disabled.</div>';
+                updateStatus("webcam-status", "error", "Libraries failed to load");
+                return false;
+            }
+            return true;
+        }
+
+
+        function updateStatus(elementId, type, message) {
+            const statusElement = document.getElementById(elementId);
+            statusElement.className = "status-indicator status-" + type;
+            statusElement.textContent = message;
+        }
+
+        async function loadModel() {
+            try {
+                // Check if libraries are loaded
+                if (!checkLibrariesLoaded()) {
+                    return;
+                }
+                
+                updateStatus("model-status", "pending", "Loading model...");
+                
+                // Load the model and metadata
+                model = await tmImage.load(modelURL, metadataURL);
+                maxPredictions = model.getTotalClasses();
+                
+                // Create prediction bars
+                createPredictionBars();
+                
+                updateStatus("model-status", "success", "Model loaded successfully");
+                
+                // Start prediction if webcam is already running
+                if (webcam && webcam.canvas) {
+                    startPrediction();
+                }
+            } catch (error) {
+                console.error("Failed to load the model:", error);
+                updateStatus("model-status", "error", "Failed to load model: " + error.message);
+            }
+        }
+        
+        function createPredictionBars() {
+            const leftColumn = document.getElementById("left-column");
+            const rightColumn = document.getElementById("right-column");
+            
+            leftColumn.innerHTML = ""; // Clear existing content
+            rightColumn.innerHTML = ""; // Clear existing content
+            
+            // Create a bar for each class, split between columns
+            for (let i = 0; i < maxPredictions; i++) {
+                const barDiv = document.createElement("div");
+                
+                const labelDiv = document.createElement("div");
+                labelDiv.className = "prediction-label";
+                
+                const nameSpan = document.createElement("span");
+                nameSpan.textContent = model.getClassLabels()[i];
+                
+                const valueSpan = document.createElement("span");
+                valueSpan.id = "value-" + i;
+                valueSpan.textContent = "0%";
+                
+                labelDiv.appendChild(nameSpan);
+                labelDiv.appendChild(valueSpan);
+                
+                const barContainer = document.createElement("div");
+                barContainer.className = "prediction-bar-container";
+                
+                const bar = document.createElement("div");
+                bar.className = "prediction-bar";
+                bar.id = "bar-" + i;
+                bar.style.width = "0%";
+                
+                const barValue = document.createElement("span");
+                barValue.className = "prediction-value";
+                barValue.id = "bar-value-" + i;
+                
+                bar.appendChild(barValue);
+                barContainer.appendChild(bar);
+                
+                barDiv.appendChild(labelDiv);
+                barDiv.appendChild(barContainer);
+                
+                // Add to left column for first 5, right column for second 5
+                if (i < 5) {
+                    leftColumn.appendChild(barDiv);
+                } else {
+                    rightColumn.appendChild(barDiv);
+                }
+            }
+        }
+        
+        async function startPrediction() {
+            if (!model || !webcam || isModelPredicting) {
+                return;
+            }
+            
+            isModelPredicting = true;
+            
+            while (isModelPredicting) {
+                // Get the prediction
+                const prediction = await model.predict(webcam.canvas);
+                
+                // Update the prediction bars
+                updatePredictionBars(prediction);
+                
+                // Pause briefly to not overload the system
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+        }
+        
+        function updatePredictionBars(predictions) {
+            // Find the highest probability prediction
+            let highestProb = 0;
+            let highestClass = "";
+            
+            for (let i = 0; i < maxPredictions; i++) {
+                const classPrediction = predictions[i];
+                const probability = classPrediction.probability.toFixed(2);
+                const percentage = (probability * 100).toFixed(0);
+                
+                // Update the bar width and text
+                const bar = document.getElementById("bar-" + i);
+                const valueText = document.getElementById("value-" + i);
+                const barValue = document.getElementById("bar-value-" + i);
+                
+                bar.style.width = percentage + "%";
+                valueText.textContent = percentage + "%";
+                barValue.textContent = percentage + "%";
+                
+                // Track highest probability
+                if (classPrediction.probability > highestProb) {
+                    highestProb = classPrediction.probability;
+                    highestClass = classPrediction.className;
+                }
+            }
+            
+            // Update the detection result
+            const resultDiv = document.getElementById("detection-result");
+            resultDiv.textContent = `Detected: ${highestClass} (${(highestProb * 100).toFixed(0)}%)`;
+            
+            // Set appropriate class based on detection - FIXED COLOR CODING
+            if (highestClass.toLowerCase().includes("cancer") || 
+                highestClass.toLowerCase().includes("malignant") || 
+                highestClass.toLowerCase().includes("abnormal")) {
+                resultDiv.className = "detection-result result-normal"; // Red for concerning results
+            } else {
+                resultDiv.className = "detection-result result-warning"; // Green for normal results
+            }
+        }
+
+        async function initWebcam() {
+            const webcamContainer = document.getElementById("webcam-container");
+            webcamContainer.innerHTML = "";
+            updateStatus("webcam-status", "pending", "Starting webcam...");
+
+            try {
+                // Check if libraries are loaded
+                if (!checkLibrariesLoaded()) {
+                    return;
+                }
+
+                // Request camera permissions explicitly first
+                try {
+                    await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            width: { ideal: 480 },
+                            height: { ideal: 360 }
+                        } 
+                    });
+                } catch (permissionError) {
+                    updateStatus("webcam-status", "error", "Camera permission denied");
+                    throw new Error("Camera permission denied or camera not available");
+                }
+
+                // Initialize and set up the webcam with larger dimensions
+                webcam = new tmImage.Webcam(480, 360, true); // Flip horizontally for mirror effect
+                await webcam.setup();
+                await webcam.play();
+                
+                // Clear container and append the webcam canvas
+                webcamContainer.innerHTML = "";
+                webcamContainer.appendChild(webcam.canvas);
+                
+                // Set up a rendering loop to continuously update the canvas
+                function renderWebcam() {
+                    webcam.update(); // This is crucial for continuously updating the canvas
+                    requestAnimationFrame(renderWebcam);
+                }
+                renderWebcam();
+                
+                updateStatus("webcam-status", "success", "Webcam active");
+                console.log("Webcam initialized successfully");
+                
+                // Start prediction if model is already loaded
+                if (model) {
+                    startPrediction();
+                }
+            } catch (error) {
+                console.error("Webcam initialization error:", error);
+                webcamContainer.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+                updateStatus("webcam-status", "error", error.message);
+            }
+        }
+
+        // ENHANCED CHATBOT FUNCTIONALITY
+        // ==============================
+
+        // Chatbot response database
+        const chatbotResponses = {
+            // Greeting patterns
+            greetings: [
+                "hello", "hi", "hey", "howdy", "greetings", "good morning", "good afternoon", "good evening"
+            ],
+            // Question patterns organized by topic
+            patterns: {
+                how_it_works: ["how", "work", "use", "function", "operate", "start", "instructions"],
+                accuracy: ["accuracy", "reliable", "trustworthy", "correct", "precise", "exact", "confidence"],
+                symptoms: ["symptom", "sign", "indication", "warning", "notice", "detect"],
+                false_results: ["false", "positive", "negative", "wrong", "incorrect", "mistake", "error"],
+                types: ["types", "kind", "sort", "variety", "different", "classification"],
+                prevention: ["prevent", "avoid", "reduce", "risk", "chance", "likelihood"],
+                treatment: ["treat", "cure", "heal", "therapy", "medication", "drug", "medicine", "surgery"],
+                about: ["who", "made", "creator", "developer", "build", "company", "team"],
+                screening: ["screen", "test", "check", "examine", "scan", "imaging"],
+                privacy: ["privacy", "data", "information", "secure", "confidential", "protect"]
+            },
+            // Comprehensive responses for each topic
+            responses: {
+                greeting: [
+                    "Hello! I'm your cancer detection assistant. How can I help you today?",
+                    "Hi there! I'm here to provide information about cancer detection. What would you like to know?",
+                    "Welcome! I can answer questions about our cancer detection tool and general cancer information."
+                ],
+                how_it_works: [
+                    "Our AI analyzes images to detect potential cancer markers. First, start your webcam using the 'Start Webcam' button, then click 'Load AI Model' to begin scanning.",
+                    "The system works by analyzing visual patterns in images that may indicate cancerous cells. Start the webcam and load the model to begin the analysis.",
+                    "This tool uses machine learning to identify visual patterns associated with cancer. Enable your webcam and load the model to start the detection process."
+                ],
+                accuracy: [
+                    "This tool provides initial screening only and has limitations. All results should be confirmed by medical professionals. Never rely solely on this tool for diagnosis.",
+                    "While our model has been trained on medical images, it can only provide a preliminary assessment. Always consult with healthcare professionals for proper diagnosis.",
+                    "The accuracy varies depending on image quality and cancer type. This is strictly a preliminary screening tool and not a replacement for professional medical evaluation."
+                ],
+                symptoms: [
+                    "Common cancer warning signs include unusual lumps, persistent pain, unexplained weight loss, fatigue, changes in skin appearance, and changes in bowel or bladder habits. Always consult a doctor about health concerns.",
+                    "Cancer symptoms vary widely but may include: persistent fatigue, unexplained weight loss, pain that doesn't go away, skin changes, unusual bleeding, and persistent cough. Early detection is crucial, so consult your doctor about any concerns.",
+                    "Warning signs differ by cancer type, but general signs include unexpected weight loss, fever, fatigue, pain, and skin changes. Remember that these symptoms can be caused by many conditions other than cancer."
+                ],
+                false_results: [
+                    "False positives and negatives can occur with any screening tool. This is why all results should be verified by healthcare professionals with proper diagnostic equipment.",
+                    "Our system may sometimes identify normal tissue as suspicious (false positive) or miss abnormal tissue (false negative). Always follow up with proper medical evaluation.",
+                    "No screening tool is perfect. Both false positives and false negatives are possible, which is why professional medical evaluation is essential regardless of the results you see here."
+                ],
+                types: [
+                    "Common types of cancer include breast, lung, prostate, colorectal, melanoma (skin), lymphoma, leukemia (blood), bladder, kidney, and pancreatic cancer. Each has different symptoms, risk factors, and treatments.",
+                    "Cancer can develop in almost any organ or tissue. The most common types include lung, breast, colorectal, prostate, and skin cancers. Different types have different outlook and treatment approaches.",
+                    "There are over 100 types of cancer. Major categories include carcinomas (affecting skin or tissues), sarcomas (in bones/muscles), leukemias (blood-forming tissue), lymphomas and myelomas (immune system)."
+                ],
+                prevention: [
+                    "Cancer prevention includes: not smoking, limiting alcohol, maintaining healthy weight, regular exercise, eating nutritious foods with plenty of fruits and vegetables, protecting yourself from the sun, and getting recommended screenings.",
+                    "Preventive measures include avoiding tobacco, limiting alcohol consumption, maintaining a healthy weight, staying physically active, eating a balanced diet rich in fruits and vegetables, practicing sun safety, and getting vaccinated against cancer-causing infections like HPV.",
+                    "While not all cancers can be prevented, you can reduce risk by avoiding tobacco, limiting alcohol, maintaining healthy weight, being physically active, eating healthily, protecting yourself from UV radiation, and getting regular check-ups."
+                ],
+                treatment: [
+                    "Cancer treatments may include surgery, radiation therapy, chemotherapy, immunotherapy, targeted therapy, hormone therapy, stem cell transplant, and precision medicine. Treatment plans are individualized based on cancer type, stage, and other factors.",
+                    "Treatment options vary by cancer type and stage, but may include surgery to remove tumors, radiation therapy, chemotherapy, immunotherapy to help your immune system fight cancer, and targeted therapies designed to target specific changes in cancer cells.",
+                    "Modern cancer treatment is often multimodal, combining approaches like surgery, radiation therapy, chemotherapy, and newer options like immunotherapy and targeted therapy. The best approach depends on the specific cancer and patient."
+                ],
+                about: [
+                    "This cancer detection tool was developed to help with preliminary screening. It uses machine learning technology trained on medical imaging data, but remember that it's not a replacement for professional medical diagnosis.",
+                    "Our tool was created to improve access to preliminary cancer screening. While we use advanced AI technology, this is an educational and screening tool only, not a diagnostic medical device.",
+                    "This application was developed to demonstrate how AI can assist in preliminary cancer detection. It should be used for educational purposes and preliminary screening only."
+                ],
+                screening: [
+                    "Cancer screening aims to detect cancer before symptoms appear. Our tool can help identify potential abnormalities, but should only be used as a preliminary step. Always follow up with proper medical evaluation.",
+                    "Regular screening is important because early detection often allows for more effective treatment. This tool can supplement but not replace recommended medical screening procedures like mammograms, colonoscopies, and skin checks.",
+                    "Different types of cancer have different screening recommendations. This tool provides an additional layer of screening but doesn't replace established medical procedures like blood tests, imaging studies, or tissue sampling."
+                ],
+                privacy: [
+                    "Your privacy is important. This application processes images locally in your browser - no images or analysis results are sent to any server or stored permanently. The webcam feed is only used for real-time analysis.",
+                    "We take privacy seriously. All processing happens directly in your browser, and no images or personal data are transmitted or stored on any external servers.",
+                    "This application respects your privacy by processing all data locally. No images from your webcam are saved or transmitted to any external systems."
+                ],
+                default: [
+                    "I'm here to help with cancer detection information. Could you rephrase your question about cancer screening or detection?",
+                    "I can provide information about cancer detection, screening, symptoms, and prevention. How can I assist you with these topics?",
+                    "I'm specialized in cancer detection information. Feel free to ask about how our tool works, cancer symptoms, screening, or prevention."
+                ]
+            }
+        };
+
+        // Function to toggle chatbot visibility
+        function toggleChatbot(event) {
+            event.stopPropagation();
+            const chatbot = document.getElementById("chatbot");
+            chatbot.style.display = chatbot.style.display === "none" || chatbot.style.display === "" ? "block" : "none";
+        }
+
+        // Function to collapse chatbot when clicking outside
+        function collapseChatbot(event) {
+            const chatbot = document.getElementById("chatbot");
+            const chatbotIcon = document.getElementById("chatbot-icon");
+            if (!chatbot.contains(event.target) && !chatbotIcon.contains(event.target)) {
+                chatbot.style.display = "none";
+            }
+        }
+
+        // Enhanced function to send chat message with improved response algorithm
+        function sendChatMessage() {
+            const inputField = document.getElementById("chat-input");
+            const message = inputField.value.trim();
+            if (message === "") return;
+
+            const chatBody = document.getElementById("chat-body");
+            
+            // Add user message
+            const userMessage = document.createElement("div");
+            userMessage.classList.add("user-message");
+            userMessage.textContent = message;
+            chatBody.appendChild(userMessage);
+
+            // Clear input field and scroll to bottom
+            inputField.value = "";
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            // Process and respond to the message
+            setTimeout(() => {
+                const botMessage = document.createElement("div");
+                botMessage.classList.add("bot-message");
+                botMessage.textContent = generateResponse(message);
+                chatBody.appendChild(botMessage);
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }, 500);
+        }
+
+        // Response generation with improved algorithm
+        function generateResponse(message) {
+            const messageLower = message.toLowerCase();
+            
+            // Check for gratitude
+            if (messageLower.includes("thank")) {
+                return "You're welcome! I'm here to help with any other questions about cancer detection or screening.";
+            }
+            
+            // Check for greetings
+            for (const greeting of chatbotResponses.greetings) {
+                if (messageLower.includes(greeting)) {
+                    return getRandomResponse(chatbotResponses.responses.greeting);
+                }
+            }
+            
+            // Check for topic patterns and generate appropriate response
+            let bestMatch = { topic: "default", matchCount: 0 };
+            
+            for (const [topic, keywords] of Object.entries(chatbotResponses.patterns)) {
+                let matchCount = 0;
+                for (const keyword of keywords) {
+                    if (messageLower.includes(keyword)) {
+                        matchCount++;
+                    }
+                }
+                
+                if (matchCount > bestMatch.matchCount) {
+                    bestMatch = { topic, matchCount };
+                }
+            }
+            
+            // Return a random response for the best matching topic
+            return getRandomResponse(chatbotResponses.responses[bestMatch.topic]);
+        }
+
+        // Get random response from array to add variety
+        function getRandomResponse(responseArray) {
+            const index = Math.floor(Math.random() * responseArray.length);
+            return responseArray[index];
+        }
+
+        // Initialize chatbot with welcome message
+        function initChatbot() {
+            const chatBody = document.getElementById("chat-body");
+            const botMessage = document.createElement("div");
+            botMessage.classList.add("bot-message");
+            botMessage.textContent = "Hello! I'm your cancer detection assistant. How can I help you today?";
+            chatBody.appendChild(botMessage);
+        }
+
+        // Wait until the page is fully loaded
+        window.onload = function() {
+            try {
+                // Initialize the chatbot
+                initChatbot();
+                
+                // Add a delay to ensure libraries are loaded
+                setTimeout(() => {
+                    if (typeof tmImage === "undefined") {
+                        console.warn("Teachable Machine Image module not loaded after timeout.");
+                        updateStatus("webcam-status", "error", "Libraries failed to load");
+                    } else {
+                        console.log("Teachable Machine Image module loaded successfully!");
+                        updateStatus("webcam-status", "pending", "Ready to start webcam");
+                        updateStatus("model-status", "pending", "Ready to load model");
+                    }
+                }, 2000);
+            } catch (error) {
+                console.error("Initialization error:", error);
+                updateStatus("webcam-status", "error", "Initialization failed");
+            }
+        };
+        
+        // Cleanup function to stop prediction when page unloads
+        window.onbeforeunload = function() {
+            isModelPredicting = false;
+            if (webcam) {
+                webcam.stop();
+            }
+        };
+    </script>
+</body>
+</html>
